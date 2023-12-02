@@ -1,0 +1,131 @@
+create table products(
+ product_no varchar2 (6) primary key,
+ product_name varchar2 (15) not null,
+ sell_price numeric(8) not null,
+ cost_price numeric(8) not null
+);
+
+insert into products values('P0018','honey',199,159);
+insert into products values('P0054','chilli powder',40,29);
+insert into products values('P0245','sugar',60,50);
+insert into products values('P0034','note book',50,30);
+insert into products values('P0067','milk',129,90);
+insert into products values('P0087','eggs',99,69);
+
+create table customers(
+	cust_no varchar2 (6) primary key,
+	name varchar2 (25) not null,
+	address varchar2 (40),
+	city varchar2 (15),
+	phone_no numeric (10)
+);
+
+insert into customers values ('c001','dimple tolani','R-274, Bandra','Bombay',6784353452);
+insert into customers values ('c002','meet tejvani','Rp-67, Pali hill','Madras',9845363784);
+insert into customers values ('c003','tirth vardan', 'M-09, Warli', 'Bombay',8745623576);
+insert into customers values ('c004','vinnita kumari', '789, Juhu', 'Bombay',7658934236);
+insert into customers values ( 'c005','dev shah','Z-549, C.P.', 'Delhi',6579823444);
+insert into customers values ( 'c006','Rukmini','Rz-521, Khandala', 'Bombay',8884569934);
+ 
+create table employees(
+	employee_no varchar2 (6) primary key,
+	employee_name varchar2 (25) not null,
+	address varchar2 (40),
+	city varchar2 (15),
+	phone_no numeric (10)
+);
+
+insert into employees values ('e001','devanshu jain','c-103, gandhinagar','gujarat',8628831415);
+insert into employees values ('e002','vivek patel','d-105, gandhinagar','gujarat',8628865515);
+insert into employees values ('e003','mansi shah','h-103, gandhinagar','gujarat',7396451415);
+insert into employees values ('e004','isha patel','h-108, gandhinagar','gujarat',8628855577); 
+
+create table stack(
+       stack_no varchar2 (6) primary key ,
+       product_no varchar2(20),
+       qty_of_product numeric (10)
+        );
+insert into stack values('S001','P0018',50);
+insert into stack values('S002','P0054',60);
+insert into stack values('S003','P0245',80);
+insert into stack values('S004','P0034',200);
+insert into stack values('S005','P0067',35);
+insert into stack values('S006','P0087',40);
+
+create table order_details(
+    order_detail_id varchar2(6) primary key,
+    cust_no varchar2(6),
+    product_no varchar2(6),
+    employee_no varchar2(6),
+    qty_of_product numeric(10),
+    discount number(5),
+    taxs number(5),
+    total_amount numeric(10, 2)
+);
+
+insert into order_details values('od001','C002','P0018','e003',3,10,2.5,400); 
+insert into order_details values('od002','C006','P0034','e001',3,10,2.5,379); 
+insert into order_details values('od003','C003','P0054','e004',1,10,2.5,60);
+insert into order_details values('od004','C005','P0245','e002',5,10,2.5,680);
+
+
+
+
+
+Retrieve all products:
+SELECT * FROM products;
+
+Retrieve all customers:
+SELECT * FROM customers;
+
+Retrieve all employees:
+SELECT * FROM employees;
+
+Retrieve all items in the stack:
+SELECT * FROM stack;
+
+Retrieve all order details:
+SELECT * FROM order_details;
+
+Retrieve products with their stack quantities:
+SELECT p.product_no, p.product_name, s.qty_of_product
+FROM products p
+JOIN stack s ON p.product_no = s.product_no;
+
+Retrieve the total quantity of each product in the stack:
+SELECT product_no, SUM(qty_of_product) AS total_quantity
+FROM stack
+GROUP BY product_no;
+
+Retrieve orders with employee details:
+SELECT o.order_detail_id, o.qty_of_product, o.discount, o.taxs, o.total_amount, e.employee_name
+FROM order_details o
+JOIN employees e ON o.employee_no = e.employee_no;
+
+Retrieve products with their sell and cost prices:
+SELECT product_no, product_name, sell_price, cost_price
+FROM products;
+ 
+Retrieve products with a sell price greater than 100:
+SELECT * FROM products WHERE sell_price > 100;
+
+
+Retrieve customers from Bombay:
+SELECT * FROM customers WHERE city = 'Bombay';
+
+Retrieve products and their quantities in the stack:
+SELECT p.product_name, s.qty_of_product FROM products p INNER JOIN stack s ON p.product_no = s.product_no;
+
+
+Retrieve the products ordered by a specific customer (e.g., 'C002'):
+SELECT c.name FROM customers c INNER JOIN order_details o ON c.cust_no = o.cust_no WHERE o.product_no = 'P0034';
+
+
+Retrieve the average total amount of orders:
+SELECT AVG(total_amount) AS average_total_amount FROM order_details;
+
+Retrieve the employee who made the highest sale:
+SELECT e.employee_name FROM employees e INNER JOIN order_details o ON e.employee_no = o.employee_no ORDER BY total_amount DESC LIMIT 1;
+
+Retrieve the total revenue for each product:
+SELECT product_no, SUM(total_amount) AS total_revenue FROM order_details GROUP BY product_no;
